@@ -1289,7 +1289,7 @@
       ['assets/images/donat-gula.webp', 'Foto Donat Gula'],
       ['assets/images/donat-meses.webp', 'Foto Donat Cokelat Meses'],
       ['assets/images/donat-topping.webp', 'Foto Donat Topping'],
-      ['assets/images/bugis-ketan.webp', 'Foto Bugis Ketan'],
+      ['assets/images/bugis-ketan-v4.webp', 'Foto Bugis Ketan'],
       ['assets/images/nagasari.webp', 'Foto Nagasari'],
       ['assets/images/bolen-cokelat.webp', 'Foto Bolen Cokelat'],
       ['assets/images/bolu-pisang.webp', 'Foto Bolu Pisang'],

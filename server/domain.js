@@ -68,6 +68,10 @@ function ensureCollections(state) {
       }
     });
   }
+  if (Array.isArray(state.menus)) {
+    const bugis = state.menus.find((m) => m.id === 'menu-014' || /Bugis Ketan/i.test(m.name));
+    if (bugis) bugis.image = 'assets/images/bugis-ketan-v4.webp';
+  }
   state.settings ||= {};
   state.orders ||= [];
   state.menus ||= [];

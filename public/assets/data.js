@@ -61,7 +61,7 @@
       'menu-011': 'assets/images/donat-gula.webp',
       'menu-012': 'assets/images/donat-meses.webp',
       'menu-013': 'assets/images/donat-topping.webp',
-      'menu-014': 'assets/images/bugis-ketan.webp',
+      'menu-014': 'assets/images/bugis-ketan-v4.webp',
       'menu-015': 'assets/images/nagasari.webp',
       'menu-016': 'assets/images/bolen-cokelat.webp',
       'menu-017': 'assets/images/bolu-pisang.webp',
