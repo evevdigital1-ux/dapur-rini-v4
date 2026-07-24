@@ -186,7 +186,7 @@
   function header(state) {
     const cartCount = state.cart.reduce((sum, item) => sum + item.qty, 0);
     return `
-      <div class="demo-ribbon">${state.settings.operationMode === 'PRODUCTION' ? 'Pemesanan Dapur Rini' : 'Mode Uji Coba • Gunakan data contoh'}</div>
+      <div class="demo-ribbon">Pemesanan Dapur Rini</div>
       <header class="site-header">
         <div class="header-inner">
           <a class="brand" href="index.html">
@@ -772,7 +772,7 @@
     previousUnreadCount = unreadCount;
     app.innerHTML = `
       <div class="admin-shell">
-        <div class="demo-ribbon">${state.settings.operationMode === 'PRODUCTION' ? 'Operasional Dapur Rini' : 'Dashboard Uji Coba'}</div>
+        <div class="demo-ribbon">Operasional Dapur Rini</div>
         <header class="admin-topbar"><div class="admin-topbar-inner"><a class="brand" href="index.html?view=admin"><span class="brand-mark">DR</span><span class="brand-copy">Admin Dapur Rini<small>Tegal Alur, Jakarta Barat</small></span></a><div class="header-actions"><a class="btn btn-ghost btn-sm" href="index.html">Lihat toko</a><button class="icon-btn theme-toggle" data-admin-action="toggle-theme" aria-label="Ganti tema">${currentTheme() === 'dark' ? '☀' : '☾'}</button><button class="notification-bell" data-admin-page="payments" aria-label="Buka pembayaran"><span>♢</span>${unreadCount ? `<em>${unreadCount}</em>` : ''}</button><button class="btn btn-dark btn-sm" data-admin-action="logout">Keluar</button></div></div></header>
         <div class="admin-layout">
           <aside class="admin-sidebar">${adminNav()}</aside>
