@@ -1319,6 +1319,14 @@
   function showMenuForm(menuId = '') {
     const state = Store.getState();
     const menu = state.menus.find((m) => m.id === menuId);
+    const defaultCategories = ['Paket Nasi', 'Donat & Kue', 'Jajanan Pasar', 'Minuman', 'Lauk Pauk', 'Snack Box'];
+    const existingCategories = Array.from(new Set([...defaultCategories, ...state.menus.map((m) => m.category).filter(Boolean)]));
+    const selectedCategory = menu?.category || 'Paket Nasi';
+
+    const defaultUnits = ['porsi', 'box', 'pcs', 'paket', 'biji', 'nampan', 'mangkuk', 'toples', 'loyang', 'potong', 'piring'];
+    const existingUnits = Array.from(new Set([...defaultUnits, ...state.menus.map((m) => m.unit).filter(Boolean)]));
+    const selectedUnit = menu?.unit || 'porsi';
+
     const imageOptions = [
       ['assets/images/jajan-pasar.webp', '-- Pilih Preset Stok Foto (Opsional) --'],
       ['assets/images/ayam-bakar.webp', 'Foto Ayam Bakar'],
@@ -1343,10 +1351,35 @@
       ['assets/images/snack-box.webp', 'Foto Snack Box']
     ];
     const selectedImage = menuImage(menu);
-    openModal(`<form id="menu-form"><div class="modal-header"><h2>${menu ? 'Edit menu' : 'Tambah menu'}</h2><button type="button" class="close-btn" data-modal-close>×</button></div><div class="modal-body"><div class="menu-photo-preview"><img id="menu-photo-preview" src="${esc(selectedImage)}" alt="Pratinjau foto menu"></div><div id="webp-status-notice" class="notice info" style="margin-bottom:12px">Pilih file foto untuk otomatis dikompresi ke format **.WebP**.</div><div class="form-grid"><div class="field field-full"><label>📸 Unggah Foto Menu (Otomatis Kompres Ke WebP)</label><input id="menu-file" type="file" accept="image/*"><span class="help">Pilih foto apa saja (JPG/PNG/WebP). Foto asli otomatis langsung dikompresi ke format .webp ringan.</span></div><div class="field field-full"><label>Atau Pilih Preset Stok Foto</label><select id="menu-image-select">${imageOptions.map(([value,label]) => `<option value="${esc(value)}" ${selectedImage === value ? 'selected' : ''}>${esc(label)}</option>`).join('')}</select></div><input type="hidden" name="image" id="menu-image-value" value="${esc(selectedImage)}"><div class="field field-full"><label>Nama menu</label><input name="name" required value="${esc(menu?.name || '')}"></div><div class="field"><label>Kategori</label><input name="category" required value="${esc(menu?.category || 'Paket Nasi')}"></div><div class="field"><label>Harga (Rp)</label><input name="price" required type="number" min="0" value="${menu?.price || 25000}"></div><div class="field"><label>Satuan</label><input name="unit" required value="${esc(menu?.unit || 'porsi')}"></div><div class="field"><label>Minimum pembuka PO</label><input name="openerMin" required type="number" min="1" value="${menu?.openerMin || 10}"></div><div class="field"><label>Kapasitas default batch</label><input name="capacity" required type="number" min="1" value="${menu?.defaultCapacity || 50}"></div><div class="field"><label>Urutan menu</label><input name="sortOrder" required type="number" min="1" value="${Number(menu?.sortOrder || state.menus.length + 1)}"></div><div class="field field-full"><label>Deskripsi menu</label><textarea name="description" required>${esc(menu?.description || '')}</textarea></div></div></div><div class="modal-footer"><button type="button" class="btn btn-ghost" data-modal-close>Batal</button><button class="btn btn-primary">Simpan menu</button></div></form>`, true);
+    openModal(`<form id="menu-form"><div class="modal-header"><h2>${menu ? 'Edit menu' : 'Tambah menu'}</h2><button type="button" class="close-btn" data-modal-close>×</button></div><div class="modal-body"><div class="menu-photo-preview"><img id="menu-photo-preview" src="${esc(selectedImage)}" alt="Pratinjau foto menu"></div><div id="webp-status-notice" class="notice info" style="margin-bottom:12px">Pilih file foto untuk otomatis dikompresi ke format **.WebP**.</div><div class="form-grid"><div class="field field-full"><label>📸 Unggah Foto Menu (Otomatis Kompres Ke WebP)</label><input id="menu-file" type="file" accept="image/*"><span class="help">Pilih foto apa saja (JPG/PNG/WebP). Foto asli otomatis langsung dikompresi ke format .webp ringan.</span></div><div class="field field-full"><label>Atau Pilih Preset Stok Foto</label><select id="menu-image-select">${imageOptions.map(([value,label]) => `<option value="${esc(value)}" ${selectedImage === value ? 'selected' : ''}>${esc(label)}</option>`).join('')}</select></div><input type="hidden" name="image" id="menu-image-value" value="${esc(selectedImage)}"><div class="field field-full"><label>Nama menu</label><input name="name" required value="${esc(menu?.name || '')}"></div><div class="field"><label>Kategori (Dropdown)</label><select id="menu-category-select" name="categorySelect">${existingCategories.map((cat) => `<option value="${esc(cat)}" ${selectedCategory === cat ? 'selected' : ''}>${esc(cat)}</option>`).join('')}<option value="__NEW_CATEGORY__">➕ Tambah Kategori Baru...</option></select><div id="new-category-wrapper" style="display:none; margin-top:6px;"><input id="new-category-input" placeholder="Tulis nama kategori baru (contoh: Lauk Pauk)..." autocomplete="off"></div></div><div class="field"><label>Satuan (Dropdown)</label><select id="menu-unit-select" name="unitSelect">${existingUnits.map((u) => `<option value="${esc(u)}" ${selectedUnit === u ? 'selected' : ''}>${esc(u)}</option>`).join('')}<option value="__NEW_UNIT__">➕ Satuan Lainnya...</option></select><div id="new-unit-wrapper" style="display:none; margin-top:6px;"><input id="new-unit-input" placeholder="Tulis satuan baru (contoh: toples)..." autocomplete="off"></div></div><div class="field"><label>Harga (Rp)</label><input name="price" required type="number" min="0" value="${menu?.price || 25000}"></div><div class="field"><label>Minimum porsi</label><input name="openerMin" required type="number" min="1" value="${menu?.openerMin || 1}"></div><div class="field"><label>Kapasitas default batch</label><input name="capacity" required type="number" min="1" value="${menu?.defaultCapacity || 50}"></div><div class="field"><label>Urutan menu</label><input name="sortOrder" required type="number" min="1" value="${Number(menu?.sortOrder || state.menus.length + 1)}"></div><div class="field field-full"><label>Deskripsi menu</label><textarea name="description" required>${esc(menu?.description || '')}</textarea></div></div></div><div class="modal-footer"><button type="button" class="btn btn-ghost" data-modal-close>Batal</button><button class="btn btn-primary">Simpan menu</button></div></form>`, true);
     const fileInput = document.getElementById('menu-file');
     const imageSelect = document.getElementById('menu-image-select');
     const statusNotice = document.getElementById('webp-status-notice');
+    const categorySelect = document.getElementById('menu-category-select');
+    const newCategoryWrapper = document.getElementById('new-category-wrapper');
+    const newCategoryInput = document.getElementById('new-category-input');
+    const unitSelect = document.getElementById('menu-unit-select');
+    const newUnitWrapper = document.getElementById('new-unit-wrapper');
+    const newUnitInput = document.getElementById('new-unit-input');
+
+    categorySelect.onchange = () => {
+      if (categorySelect.value === '__NEW_CATEGORY__') {
+        newCategoryWrapper.style.display = 'block';
+        newCategoryInput.focus();
+      } else {
+        newCategoryWrapper.style.display = 'none';
+      }
+    };
+
+    unitSelect.onchange = () => {
+      if (unitSelect.value === '__NEW_UNIT__') {
+        newUnitWrapper.style.display = 'block';
+        newUnitInput.focus();
+      } else {
+        newUnitWrapper.style.display = 'none';
+      }
+    };
+
     fileInput.onchange = async () => {
       const file = fileInput.files[0];
       if (!file) return;
@@ -1380,6 +1413,21 @@
       const data = Object.fromEntries(new FormData(form));
       const submit = form.querySelector('button[type="submit"], button:not([type])');
       submit.disabled = true;
+
+      let finalCategory = data.categorySelect;
+      if (finalCategory === '__NEW_CATEGORY__') {
+        finalCategory = newCategoryInput.value.trim() || 'Lainnya';
+      }
+      delete data.categorySelect;
+      data.category = finalCategory;
+
+      let finalUnit = data.unitSelect;
+      if (finalUnit === '__NEW_UNIT__') {
+        finalUnit = newUnitInput.value.trim() || 'porsi';
+      }
+      delete data.unitSelect;
+      data.unit = finalUnit;
+
       if (String(data.image || '').startsWith('data:')) {
         data.imageData = data.image;
         delete data.image;
