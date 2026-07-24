@@ -6,9 +6,10 @@ const vm = require('vm');
 const crypto = require('crypto');
 const domain = require('./domain');
 
+const os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_ROOT = path.join(ROOT, 'public');
-const DATA_DIR = process.env.DAPUR_RINI_DATA_DIR ? path.resolve(process.env.DAPUR_RINI_DATA_DIR) : path.join(__dirname, 'data');
+const DATA_DIR = process.env.DAPUR_RINI_DATA_DIR ? path.resolve(process.env.DAPUR_RINI_DATA_DIR) : (process.env.VERCEL ? path.join(os.tmpdir(), 'dapur-rini-data') : path.join(__dirname, 'data'));
 const STATE_FILE = path.join(DATA_DIR, 'state.json');
 const AUDIT_FILE = path.join(DATA_DIR, 'audit.log');
 const SESSION_FILE = path.join(DATA_DIR, 'sessions.json');
@@ -56,11 +57,15 @@ function atomicWriteJson(filepath, value) {
 }
 
 function initializeFile() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(STATE_FILE)) atomicWriteJson(STATE_FILE, createRuntimeSeed(new Date()));
-  if (!fs.existsSync(AUDIT_FILE)) fs.writeFileSync(AUDIT_FILE, '', { encoding: 'utf8', mode: 0o600 });
-  if (!fs.existsSync(SESSION_FILE)) atomicWriteJson(SESSION_FILE, []);
-  if (!fs.existsSync(TRUSTED_DEVICE_FILE)) atomicWriteJson(TRUSTED_DEVICE_FILE, []);
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(STATE_FILE)) atomicWriteJson(STATE_FILE, createRuntimeSeed(new Date()));
+    if (!fs.existsSync(AUDIT_FILE)) fs.writeFileSync(AUDIT_FILE, '', { encoding: 'utf8', mode: 0o600 });
+    if (!fs.existsSync(SESSION_FILE)) atomicWriteJson(SESSION_FILE, []);
+    if (!fs.existsSync(TRUSTED_DEVICE_FILE)) atomicWriteJson(TRUSTED_DEVICE_FILE, []);
+  } catch (err) {
+    console.warn('File initialization warning:', err.message);
+  }
 }
 
 function readJsonFile(filepath, fallback) {

@@ -15,3 +15,5 @@ server/private-storage/*
 
 .vercel
 .env*
+supabase/.temp/
+scripts/set-vercel-env.js

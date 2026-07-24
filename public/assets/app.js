@@ -1390,7 +1390,7 @@
         } catch (_) {}
       }, 5000);
     } catch (error) {
-      app.innerHTML = `<main class="login-page"><section class="login-card"><h1>Server lokal tidak terhubung</h1><p>${esc(error.message)}</p><div class="notice danger">Jalankan <code>START-DEMO.bat</code> atau <code>./start-demo.sh</code>. Versi 3.0 memerlukan Node.js dan tidak mendukung pembukaan langsung melalui file.</div></section></main>`;
+      app.innerHTML = `<main class="login-page"><section class="login-card"><h1>Gagal Memuat Aplikasi</h1><p>${esc(error.message)}</p><div class="notice danger">Gagal terhubung ke server backend Vercel. Pastikan koneksi internet stabil dan backend Vercel + Supabase sudah aktif.</div></section></main>`;
     }
   }
 
