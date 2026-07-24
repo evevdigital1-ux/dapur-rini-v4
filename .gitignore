@@ -12,3 +12,6 @@ server/private-storage/*
 **/pre-recovery-*/
 *.log
 .DS_Store
+
+.vercel
+.env*

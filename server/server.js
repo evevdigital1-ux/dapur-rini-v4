@@ -32,10 +32,10 @@ if (!process.env.DAPUR_RINI_ADMIN_PASSWORD) console.warn('PERINGATAN: password a
 if (IS_PRODUCTION && db.DRIVER !== 'postgres') console.warn('PERINGATAN: mode produksi aktif tanpa PostgreSQL. Readiness akan gagal.');
 
 async function ensureInitialized() {
-  if (process.env.VERCEL && IS_PRODUCTION && db.DRIVER !== 'postgres') {
+  if (process.env.VERCEL && OPERATION_MODE === 'PRODUCTION' && db.DRIVER !== 'postgres') {
     throw Object.assign(new Error('DATABASE_URL Supabase wajib diatur pada deployment Vercel production.'), { statusCode: 503 });
   }
-  if (process.env.VERCEL && IS_PRODUCTION && storage.DRIVER !== 'supabase') {
+  if (process.env.VERCEL && OPERATION_MODE === 'PRODUCTION' && storage.DRIVER !== 'supabase') {
     throw Object.assign(new Error('SUPABASE_URL dan SUPABASE_SECRET_KEY wajib diatur pada deployment Vercel production.'), { statusCode: 503 });
   }
   if (!initializePromise) initializePromise = Promise.all([db.initialize(), storage.initialize()]);
