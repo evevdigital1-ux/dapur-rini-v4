@@ -306,9 +306,8 @@
           </div>
           <div class="testimonial-rail">
             ${testimonials.length ? testimonials.map((item) => `
-              <button class="testimonial-card" data-action="view-testimonial" data-testimonial-id="${esc(item.id)}" aria-label="Buka testimoni ${esc(item.name)}">
-                <span class="testimonial-image-wrap"><img src="${esc(item.image)}" alt="Screenshot WhatsApp testimoni ${esc(item.name)}" loading="lazy"></span>
-                <span class="testimonial-copy"><strong>${esc(item.name)}</strong><small>${esc(item.menuName)}</small><em>${esc(item.caption || '')}</em></span>
+              <button class="testimonial-card" data-action="view-testimonial" data-testimonial-id="${esc(item.id)}" aria-label="Buka screenshot testimoni">
+                <span class="testimonial-image-wrap"><img src="${esc(item.image)}" alt="Screenshot WhatsApp testimoni" loading="lazy"></span>
               </button>`).join('') : '<div class="empty-state"><strong>Belum ada testimoni aktif</strong></div>'}
           </div>
         </div>
@@ -484,8 +483,8 @@
     const item = state.testimonials.find((entry) => entry.id === testimonialId);
     if (!item) return;
     openModal(`
-      <div class="modal-header"><div><h2>${esc(item.name)}</h2><div class="help">${esc(item.menuName)}</div></div><button class="close-btn" data-modal-close>×</button></div>
-      <div class="modal-body"><div class="testimonial-modal-image"><img src="${esc(item.image)}" alt="Screenshot WhatsApp testimoni ${esc(item.name)}"></div><p class="testimonial-modal-caption">${esc(item.caption || '')}</p><div class="notice">Nomor telepon, alamat, dan informasi pembayaran telah disamarkan.</div></div>
+      <div class="modal-header"><div><h2>Testimoni Pelanggan</h2><div class="help">Screenshot Chat WhatsApp</div></div><button class="close-btn" data-modal-close>×</button></div>
+      <div class="modal-body"><div class="testimonial-modal-image"><img src="${esc(item.image)}" alt="Screenshot WhatsApp testimoni"></div><div class="notice" style="margin-top:14px">Nomor telepon, alamat, dan informasi pembayaran telah disamarkan.</div></div>
       <div class="modal-footer"><button class="btn btn-ghost" data-modal-close>Tutup</button><button class="btn btn-whatsapp" id="testimonial-chat">Tanya melalui WhatsApp</button></div>`);
     document.getElementById('testimonial-chat').onclick = () => showWhatsAppOptions();
   }
