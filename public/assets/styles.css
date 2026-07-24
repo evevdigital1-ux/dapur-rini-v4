@@ -254,17 +254,53 @@ h1 {
   min-width: 0;
 }
 .product-visual {
-  min-height: 180px;
+  width: 100%;
+  height: 230px;
+  min-height: 230px;
+  max-height: 230px;
   position: relative;
-  display: grid;
-  place-items: center;
-  font-size: 80px;
-  background:
-    radial-gradient(circle at 30% 15%, rgba(255,255,255,.82), transparent 27%),
-    linear-gradient(135deg, #ffe2bd, #f2a967 62%, #d8713f);
+  display: block;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: var(--surface-2);
+  cursor: pointer;
 }
-.product-card:nth-child(3n+2) .product-visual { background: linear-gradient(135deg, #f7e2c7, #e8b277 62%, #bf6b4c); }
-.product-card:nth-child(3n+3) .product-visual { background: linear-gradient(135deg, #ffe5cb, #efbe80 62%, #c95030); }
+.product-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform .25s ease;
+}
+.product-card:hover .product-visual img {
+  transform: scale(1.04);
+}
+.product-photo-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.08), transparent 40%, rgba(0,0,0,.28));
+  pointer-events: none;
+}
+.modal-product-photo {
+  width: 100%;
+  height: 260px;
+  max-height: 320px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface-2);
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+}
+.modal-product-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
 .product-badge { position: absolute; top: 13px; left: 13px; }
 .badge {
   display: inline-flex;
