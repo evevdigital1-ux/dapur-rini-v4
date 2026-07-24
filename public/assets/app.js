@@ -394,8 +394,7 @@
         <button data-action="open-whatsapp"><span>WA</span>Chat</button>
         <button data-action="track-order"><span>⌕</span>Lacak</button>
         <button data-action="open-cart"><span>🛒</span>Keranjang<em>${state.cart.reduce((sum, item) => sum + item.qty, 0)}</em></button>
-      </nav>
-      <a class="evevdigital-badge" href="https://github.com/evevdigital1-ux/dapur-rini-v4" target="_blank" rel="noopener"><span class="dot"></span>Crafted by evevdigital</a>`;
+      </nav>`;
 
     bindCustomerEvents();
     startCountdowns();
@@ -1509,7 +1508,6 @@
 
   async function bootstrap() {
     try {
-      console.log('%c Crafted by evevdigital • Dapur Rini v4.0 ', 'background: #1a1a1a; color: #10b981; font-weight: bold; padding: 4px 8px; border-radius: 4px;');
       await Store.init();
       if (isAdminRoute) renderAdmin(); else renderCustomer();
       setInterval(async () => {
