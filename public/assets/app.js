@@ -868,10 +868,10 @@
   }
 
   function adminMenus(state) {
-    return `${pageHeading('Kelola menu', 'Edit katalog dan buat beberapa batch PO untuk menu yang sama.', '<button class="btn btn-primary" data-admin-action="add-menu">+ Tambah menu</button>')}<section class="admin-panel"><div class="admin-menu-grid">${state.menus.map((menu) => {
+    return `${pageHeading('Kelola menu', 'Edit katalog, ganti foto menu, dan buat batch PO.', '<button class="btn btn-primary" data-admin-action="add-menu">+ Tambah menu</button>')}<section class="admin-panel"><div class="admin-menu-grid">${state.menus.map((menu) => {
       const menuBatches = state.batches.filter((batch) => batch.menuId === menu.id);
       const activeBatch = Store.selectBatchForMenu(menu.id);
-      return `<article class="admin-menu-card"><img src="${esc(menuImage(menu))}" alt="${esc(menu.imageAlt || `Foto ${menu.name}`)}"><div class="admin-menu-body"><div class="admin-menu-title"><div><span>${esc(menu.category)}</span><h3>${esc(menu.name)}</h3></div><span class="badge ${menu.active ? 'badge-open' : 'badge-closed'}">${menu.active ? 'Aktif' : 'Nonaktif'}</span></div><p>${rupiah(menu.price)} / ${esc(menu.unit)} • Pembuka ${menu.openerMin} • Kapasitas default ${menu.defaultCapacity}</p><p>${menuBatches.length} batch • Prioritas pelanggan: <strong>${activeBatch ? (batchLabel[activeBatch.status]?.[0] || esc(activeBatch.status)) : 'Belum ada batch'}</strong></p><div class="admin-row-actions"><button class="btn btn-ghost btn-sm" data-admin-action="edit-menu" data-menu-id="${esc(menu.id)}">Edit</button><button class="btn btn-secondary btn-sm" data-admin-action="add-batch" data-menu-id="${esc(menu.id)}">+ Batch baru</button><button class="btn ${menu.active ? 'btn-warning' : 'btn-success'} btn-sm" data-admin-action="toggle-menu" data-menu-id="${esc(menu.id)}">${menu.active ? 'Nonaktifkan' : 'Aktifkan'}</button></div></div></article>`;
+      return `<article class="admin-menu-card"><img src="${esc(menuImage(menu))}" alt="${esc(menu.imageAlt || `Foto ${menu.name}`)}"><div class="admin-menu-body"><div class="admin-menu-title"><div><span>${esc(menu.category)}</span><h3>${esc(menu.name)}</h3></div><span class="badge ${menu.active ? 'badge-open' : 'badge-closed'}">${menu.active ? 'Aktif' : 'Nonaktif'}</span></div><p>${rupiah(menu.price)} / ${esc(menu.unit)} • Pembuka ${menu.openerMin} • Kapasitas default ${menu.defaultCapacity}</p><p>${menuBatches.length} batch • Prioritas pelanggan: <strong>${activeBatch ? (batchLabel[activeBatch.status]?.[0] || esc(activeBatch.status)) : 'Belum ada batch'}</strong></p><div class="admin-row-actions"><button class="btn btn-ghost btn-sm" data-admin-action="edit-menu" data-menu-id="${esc(menu.id)}">Edit</button><button class="btn btn-secondary btn-sm" data-admin-action="add-batch" data-menu-id="${esc(menu.id)}">+ Batch baru</button><button class="btn ${menu.active ? 'btn-warning' : 'btn-success'} btn-sm" data-admin-action="toggle-menu" data-menu-id="${esc(menu.id)}">${menu.active ? 'Nonaktifkan' : 'Aktifkan'}</button><button class="btn btn-danger btn-sm" data-admin-action="delete-menu" data-menu-id="${esc(menu.id)}">Hapus</button></div></div></article>`;
     }).join('')}</div></section>`;
   }
 
@@ -1273,9 +1273,43 @@
     startCountdowns();
   }
 
+  function compressImageToWebP(file, maxDimension = 1200, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const webpDataUrl = canvas.toDataURL('image/webp', quality);
+        resolve({ dataUrl: webpDataUrl, width, height, approxKb: Math.round((webpDataUrl.length * 0.75) / 1024) });
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('File yang dipilih bukan gambar yang valid.'));
+      };
+      img.src = objectUrl;
+    });
+  }
+
   function showMenuForm(menuId = '') {
-    const state = Store.getState(); const menu = state.menus.find((m) => m.id === menuId);
+    const state = Store.getState();
+    const menu = state.menus.find((m) => m.id === menuId);
     const imageOptions = [
+      ['assets/images/jajan-pasar.webp', '-- Pilih Preset Stok Foto (Opsional) --'],
       ['assets/images/ayam-bakar.webp', 'Foto Ayam Bakar'],
       ['assets/images/ayam-serundeng.webp', 'Foto Ayam Serundeng'],
       ['assets/images/ayam-geprek.webp', 'Foto Ayam Geprek'],
@@ -1298,17 +1332,54 @@
       ['assets/images/snack-box.webp', 'Foto Snack Box']
     ];
     const selectedImage = menuImage(menu);
-    openModal(`<form id="menu-form"><div class="modal-header"><h2>${menu ? 'Edit menu' : 'Tambah menu'}</h2><button type="button" class="close-btn" data-modal-close>×</button></div><div class="modal-body"><div class="menu-photo-preview"><img id="menu-photo-preview" src="${esc(selectedImage)}" alt="Pratinjau foto menu"></div><div class="form-grid"><div class="field field-full"><label>Nama menu</label><input name="name" required value="${esc(menu?.name || '')}"></div><div class="field"><label>Kategori</label><input name="category" required value="${esc(menu?.category || 'Paket Nasi')}"></div><div class="field"><label>Foto pilihan</label><select name="image" id="menu-image-select">${imageOptions.map(([value,label]) => `<option value="${esc(value)}" ${selectedImage === value ? 'selected' : ''}>${esc(label)}</option>`).join('')}</select></div><div class="field"><label>Harga</label><input name="price" required type="number" min="0" value="${menu?.price || 25000}"></div><div class="field"><label>Satuan</label><input name="unit" required value="${esc(menu?.unit || 'porsi')}"></div><div class="field"><label>Minimum pembuka</label><input name="openerMin" required type="number" min="1" value="${menu?.openerMin || 10}"></div><div class="field"><label>Kapasitas</label><input name="capacity" required type="number" min="1" value="${menu?.defaultCapacity || 50}"></div><div class="field"><label>Urutan menu</label><input name="sortOrder" required type="number" min="1" value="${Number(menu?.sortOrder || state.menus.length + 1)}"></div><div class="field field-full"><label>Deskripsi</label><textarea name="description" required>${esc(menu?.description || '')}</textarea></div></div></div><div class="modal-footer"><button type="button" class="btn btn-ghost" data-modal-close>Batal</button><button class="btn btn-primary">Simpan menu</button></div></form>`, true);
+    openModal(`<form id="menu-form"><div class="modal-header"><h2>${menu ? 'Edit menu' : 'Tambah menu'}</h2><button type="button" class="close-btn" data-modal-close>×</button></div><div class="modal-body"><div class="menu-photo-preview"><img id="menu-photo-preview" src="${esc(selectedImage)}" alt="Pratinjau foto menu"></div><div id="webp-status-notice" class="notice info" style="margin-bottom:12px">Pilih file foto untuk otomatis dikompresi ke format **.WebP**.</div><div class="form-grid"><div class="field field-full"><label>📸 Unggah Foto Menu (Otomatis Kompres Ke WebP)</label><input id="menu-file" type="file" accept="image/*"><span class="help">Pilih foto apa saja (JPG/PNG/WebP). Foto asli otomatis langsung dikompresi ke format .webp ringan.</span></div><div class="field field-full"><label>Atau Pilih Preset Stok Foto</label><select id="menu-image-select">${imageOptions.map(([value,label]) => `<option value="${esc(value)}" ${selectedImage === value ? 'selected' : ''}>${esc(label)}</option>`).join('')}</select></div><input type="hidden" name="image" id="menu-image-value" value="${esc(selectedImage)}"><div class="field field-full"><label>Nama menu</label><input name="name" required value="${esc(menu?.name || '')}"></div><div class="field"><label>Kategori</label><input name="category" required value="${esc(menu?.category || 'Paket Nasi')}"></div><div class="field"><label>Harga (Rp)</label><input name="price" required type="number" min="0" value="${menu?.price || 25000}"></div><div class="field"><label>Satuan</label><input name="unit" required value="${esc(menu?.unit || 'porsi')}"></div><div class="field"><label>Minimum pembuka PO</label><input name="openerMin" required type="number" min="1" value="${menu?.openerMin || 10}"></div><div class="field"><label>Kapasitas default batch</label><input name="capacity" required type="number" min="1" value="${menu?.defaultCapacity || 50}"></div><div class="field"><label>Urutan menu</label><input name="sortOrder" required type="number" min="1" value="${Number(menu?.sortOrder || state.menus.length + 1)}"></div><div class="field field-full"><label>Deskripsi menu</label><textarea name="description" required>${esc(menu?.description || '')}</textarea></div></div></div><div class="modal-footer"><button type="button" class="btn btn-ghost" data-modal-close>Batal</button><button class="btn btn-primary">Simpan menu</button></div></form>`, true);
+    const fileInput = document.getElementById('menu-file');
     const imageSelect = document.getElementById('menu-image-select');
-    imageSelect.onchange = () => { document.getElementById('menu-photo-preview').src = imageSelect.value; };
-    document.getElementById('menu-form').onsubmit = async (event) => {
-      event.preventDefault(); const data = Object.fromEntries(new FormData(event.currentTarget));
-      const submit = event.currentTarget.querySelector('button[type="submit"], button:not([type])');
-      submit.disabled = true;
-      const patch = { ...data, price: Number(data.price), openerMin: Number(data.openerMin), defaultCapacity: Number(data.capacity), sortOrder: Number(data.sortOrder), imageAlt: `Foto pilihan ${data.name}` };
+    const statusNotice = document.getElementById('webp-status-notice');
+    fileInput.onchange = async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      statusNotice.className = 'notice info';
+      statusNotice.innerHTML = '⚙️ Mengompresi foto ke format WebP...';
       try {
-        if (menu) await Store.updateMenu(menu.id, patch); else await Store.addMenu({ ...data, capacity: Number(data.capacity), sortOrder: Number(data.sortOrder) });
-        closeModal(); renderAdmin(); toast('Menu disimpan.', 'success');
+        const result = await compressImageToWebP(file);
+        document.getElementById('menu-image-value').value = result.dataUrl;
+        document.getElementById('menu-photo-preview').src = result.dataUrl;
+        statusNotice.className = 'notice success';
+        statusNotice.innerHTML = `✅ Foto berhasil dikompresi ke <strong>WebP</strong> (${result.approxKb} KB, ${result.width}×${result.height}px). Foto asli telah dilepas dari memori.`;
+      } catch (error) {
+        toast(error.message, 'error');
+        statusNotice.className = 'notice danger';
+        statusNotice.innerHTML = `⚠️ ${esc(error.message)}`;
+        fileInput.value = '';
+      }
+    };
+    imageSelect.onchange = () => {
+      if (imageSelect.value && imageSelect.value !== 'assets/images/jajan-pasar.webp') {
+        document.getElementById('menu-image-value').value = imageSelect.value;
+        document.getElementById('menu-photo-preview').src = imageSelect.value;
+        fileInput.value = '';
+        statusNotice.className = 'notice info';
+        statusNotice.innerHTML = 'Preset stok foto dipilih.';
+      }
+    };
+    document.getElementById('menu-form').onsubmit = async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const data = Object.fromEntries(new FormData(form));
+      const submit = form.querySelector('button[type="submit"], button:not([type])');
+      submit.disabled = true;
+      if (String(data.image || '').startsWith('data:')) {
+        data.imageData = data.image;
+        delete data.image;
+      }
+      const patch = { ...data, price: Number(data.price), openerMin: Number(data.openerMin), defaultCapacity: Number(data.capacity), sortOrder: Number(data.sortOrder), imageAlt: `Foto menu ${data.name}` };
+      try {
+        if (menu) await Store.updateMenu(menu.id, patch);
+        else await Store.addMenu({ ...data, capacity: Number(data.capacity), sortOrder: Number(data.sortOrder), price: Number(data.price), openerMin: Number(data.openerMin) });
+        closeModal();
+        renderAdmin();
+        toast('Menu berhasil disimpan.', 'success');
       } catch (error) { toast(error.message, 'error'); submit.disabled = false; }
     };
   }

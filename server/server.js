@@ -197,7 +197,7 @@ async function clearRateLimit(scope, req) {
 
 async function savePublicDataUrl(dataUrl, prefix) {
   if (!dataUrl) return '';
-  const publicPrefix = prefix.startsWith('qris') ? 'qris' : 'testimonial';
+  const publicPrefix = prefix.startsWith('menu') ? 'menu' : prefix.startsWith('qris') ? 'qris' : 'testimonial';
   const saved = await storage.savePublicImageDataUrl(dataUrl, publicPrefix);
   return storage.publicMediaUrl(saved.key);
 }
@@ -219,6 +219,7 @@ async function executeCommand(command, payload, auth) {
   let previousPublicImage = '';
   try {
     if (['addTestimonial', 'updateTestimonial'].includes(command) && payload.imageData) imagePath = await savePublicDataUrl(payload.imageData, 'testimonial');
+    if (['addMenu', 'updateMenu'].includes(command) && (payload.imageData || payload.patch?.imageData)) imagePath = await savePublicDataUrl(payload.imageData || payload.patch?.imageData, 'menu');
     if (command === 'updateSettings' && payload.qrisImageData) imagePath = await savePublicDataUrl(payload.qrisImageData, 'qris');
     const result = await db.transaction((state) => {
       state.settings.operationMode = OPERATION_MODE;
@@ -234,8 +235,18 @@ async function executeCommand(command, payload, auth) {
         case 'bulkProductionStatus': return domain.bulkProductionStatus(state, payload.status, payload.deliveryDate || '');
         case 'updateBatch': return domain.updateBatch(state, payload.batchId, payload.patch || {});
         case 'closeAllOpenBatches': return domain.closeAllOpenBatches(state);
-        case 'updateMenu': return domain.updateMenu(state, payload.menuId, payload.patch || {});
-        case 'addMenu': return domain.addMenu(state, payload);
+        case 'updateMenu': {
+          const menu = state.menus.find((item) => item.id === payload.menuId);
+          if (menu) previousPublicImage = menu.image || '';
+          const patch = { ...(payload.patch || {}), ...(imagePath ? { image: imagePath } : {}) };
+          delete patch.imageData;
+          return domain.updateMenu(state, payload.menuId, patch);
+        }
+        case 'addMenu': {
+          const data = { ...payload, ...(imagePath ? { image: imagePath } : {}) };
+          delete data.imageData;
+          return domain.addMenu(state, data);
+        }
         case 'deleteMenu': return domain.deleteMenu(state, payload.menuId);
         case 'addBatch': return domain.addBatch(state, payload);
         case 'updateSettings':
