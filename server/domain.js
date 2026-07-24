@@ -534,6 +534,22 @@ function validateMenuPayload(payload, partial = false) {
   return result;
 }
 
+function deleteMenu(state, menuId) {
+  const menu = state.menus.find((item) => item.id === menuId);
+  if (!menu) throw new Error('Menu tidak ditemukan.');
+  const hasOrderLinks = state.orders.some((order) => order.items.some((item) => item.menuId === menuId));
+  const hasActiveBatches = state.batches.some((batch) => batch.menuId === menuId && ['WAITING_OPENER', 'OPEN', 'CLOSING_SOON', 'OPENER_PENDING_PAYMENT', 'SCHEDULED', 'DRAFT'].includes(batch.status));
+  if (hasOrderLinks || hasActiveBatches) {
+    menu.active = false;
+    addLog(state, 'DISABLE_MENU', `${menu.name} dinonaktifkan karena masih memiliki keterkaitan pesanan atau batch.`, 'admin');
+    return menu;
+  }
+  state.menus = state.menus.filter((item) => item.id !== menuId);
+  state.batches = state.batches.filter((batch) => batch.menuId !== menuId);
+  addLog(state, 'DELETE_MENU', `${menu.name} dihapus dari katalog.`, 'admin');
+  return menu || null;
+}
+
 function updateMenu(state, menuId, patch) {
   const menu = state.menus.find((item) => item.id === menuId);
   if (!menu) throw new Error('Menu tidak ditemukan.');
@@ -662,7 +678,7 @@ function assertInvariants(state) {
 
 module.exports = {
   ensureCollections, processExpiredOrders, availableQty, requiredMin, canPurchase, createOrder, submitPaymentProof, reviewPayment, verifyOrder, confirmRefund, rejectOrExpireOrder,
-  extendPaymentDeadline, updateOrderStatus, bulkProductionStatus, updateBatch, closeAllOpenBatches, updateMenu, addMenu, addBatch,
+  extendPaymentDeadline, updateOrderStatus, bulkProductionStatus, updateBatch, closeAllOpenBatches, deleteMenu, updateMenu, addMenu, addBatch,
   updateSettings, markNotificationRead, markAllNotificationsRead, addTestimonial, updateTestimonial, deleteTestimonial,
   assertInvariants, deepClone, normalizePhone
 };

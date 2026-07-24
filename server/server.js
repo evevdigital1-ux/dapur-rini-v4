@@ -236,6 +236,7 @@ async function executeCommand(command, payload, auth) {
         case 'closeAllOpenBatches': return domain.closeAllOpenBatches(state);
         case 'updateMenu': return domain.updateMenu(state, payload.menuId, payload.patch || {});
         case 'addMenu': return domain.addMenu(state, payload);
+        case 'deleteMenu': return domain.deleteMenu(state, payload.menuId);
         case 'addBatch': return domain.addBatch(state, payload);
         case 'updateSettings':
           previousPublicImage = state.settings.qrisImage || '';

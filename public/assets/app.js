@@ -787,14 +787,14 @@
 
   function adminNav() {
     const links = [
-      ['dashboard', '⌂', 'Hari ini'], ['payments', '✓', 'Pembayaran'], ['production', '◇', 'Produksi'],
+      ['dashboard', '⌂', 'Hari ini'], ['menus', '☰', 'Menu'], ['payments', '✓', 'Pembayaran'], ['production', '◇', 'Produksi'],
       ['orders', '▤', 'Pesanan'], ['settings', '⚙', 'Pengaturan']
     ];
     return `<div class="admin-nav">${links.map(([id, icon, label]) => `<button class="${activeAdminPage === id ? 'active' : ''}" data-admin-page="${id}"><span>${icon}</span>${label}</button>`).join('')}</div>`;
   }
 
   function adminBottomNav() {
-    const links = [['dashboard', '⌂', 'Hari ini'], ['payments', '✓', 'Bayar'], ['production', '◇', 'Produksi'], ['orders', '▤', 'Pesanan'], ['settings', '⚙', 'Atur']];
+    const links = [['dashboard', '⌂', 'Hari ini'], ['menus', '☰', 'Menu'], ['payments', '✓', 'Bayar'], ['production', '◇', 'Produksi'], ['orders', '▤', 'Pesanan'], ['settings', '⚙', 'Atur']];
     return links.map(([id, icon, label]) => `<button class="${activeAdminPage === id ? 'active' : ''}" data-admin-page="${id}"><span>${icon}</span>${label}</button>`).join('');
   }
 

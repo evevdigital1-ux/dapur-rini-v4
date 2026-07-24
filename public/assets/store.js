@@ -186,6 +186,7 @@
   const closeAllOpenBatches = () => command('closeAllOpenBatches');
   const updateMenu = (menuId, patch) => command('updateMenu', { menuId, patch });
   const addMenu = (payload) => command('addMenu', payload);
+  const deleteMenu = (menuId) => command('deleteMenu', { menuId });
   const addBatch = (payload) => command('addBatch', payload);
   const updateSettings = (patch) => command('updateSettings', { patch, qrisImageData: patch.qrisImageData || '' });
   const markNotificationRead = (notificationId) => command('markNotificationRead', { notificationId });
@@ -250,7 +251,7 @@
     init, refresh, getState, availableQty, requiredMin, canPurchase, selectBatchForMenu,
     addToCart, setCartQty, clearCart, checkout, submitPaymentProof, reviewPayment, verifyOrder, confirmRefund, rejectOrExpireOrder,
     extendPaymentDeadline, updateOrderStatus, bulkProductionStatus, updateBatch, closeAllOpenBatches,
-    updateMenu, addMenu, addBatch, updateSettings, markNotificationRead, markAllNotificationsRead,
+    updateMenu, addMenu, deleteMenu, addBatch, updateSettings, markNotificationRead, markAllNotificationsRead,
     addTestimonial, updateTestimonial, deleteTestimonial, processExpiredOrders, reset,
     login, logout, isLoggedIn, trackOrder
   };
