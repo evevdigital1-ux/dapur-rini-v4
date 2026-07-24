@@ -573,9 +573,34 @@ function updateMenu(state, menuId, patch) {
 
 function addMenu(state, payload) {
   const clean = validateMenuPayload(payload, false);
-  const menu = { id: uid('menu'), sortOrder: clean.sortOrder || state.menus.length + 1, ...clean, regularMin: 1, icon: cleanText(payload.icon || '🍽️', 'Ikon', { max: 8 }), image: clean.image || 'assets/images/jajan-pasar.webp', imageAlt: clean.imageAlt || `${clean.name}`, featured: false, active: true, isDemo: true };
+  const menu = { id: uid('menu'), sortOrder: clean.sortOrder || state.menus.length + 1, ...clean, regularMin: 1, icon: cleanText(payload.icon || '🍽️', 'Ikon', { max: 8 }), image: clean.image || 'assets/images/jajan-pasar.webp', imageAlt: clean.imageAlt || `Foto ${clean.name}`, featured: false, active: true, isDemo: true };
   state.menus.push(menu);
-  addLog(state, 'ADD_MENU', `${menu.name} ditambahkan.`, 'admin');
+
+  const now = Date.now();
+  const closesAt = new Date(now + 24 * 60 * 60 * 1000).toISOString();
+  const deliveryAt = new Date(now + 48 * 60 * 60 * 1000).toISOString();
+  const deliveryEndAt = new Date(now + 52 * 60 * 60 * 1000).toISOString();
+  const batch = {
+    id: uid('batch'),
+    menuId: menu.id,
+    status: 'OPEN',
+    soldQty: 0,
+    heldQty: 0,
+    capacity: positiveInteger(payload.capacity ?? menu.defaultCapacity, 'Kapasitas', { min: 1, max: 100000 }),
+    openerMin: positiveInteger(payload.openerMin ?? menu.openerMin, 'Minimum pembuka', { min: 1, max: 10000 }),
+    regularMin: 1,
+    price: nonNegativeNumber(payload.price ?? menu.price, 'Harga batch'),
+    opensAt: new Date(now).toISOString(),
+    closesAt,
+    deliveryAt,
+    deliveryEndAt,
+    openerOrderId: null,
+    closedByAdmin: false,
+    isDemo: true
+  };
+  state.batches.push(batch);
+
+  addLog(state, 'ADD_MENU', `${menu.name} ditambahkan dengan batch PO aktif.`, 'admin');
   return menu;
 }
 

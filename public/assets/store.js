@@ -111,7 +111,26 @@
       const pa = batchPriority(a); const pb = batchPriority(b);
       return pa[0] - pb[0] || pa[1] - pb[1];
     });
-    return batches.find(canPurchase) || batches[0] || null;
+    const found = batches.find(canPurchase) || batches[0] || null;
+    if (found) return found;
+    const menu = state.menus.find((m) => m.id === menuId);
+    if (!menu || !menu.active) return null;
+    const now = Date.now();
+    return {
+      id: `batch-${menu.id}`,
+      menuId: menu.id,
+      status: 'OPEN',
+      soldQty: 0,
+      heldQty: 0,
+      capacity: menu.defaultCapacity || 50,
+      openerMin: menu.openerMin || 1,
+      regularMin: 1,
+      price: menu.price || 0,
+      opensAt: new Date(now).toISOString(),
+      closesAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(),
+      deliveryAt: new Date(now + 48 * 60 * 60 * 1000).toISOString(),
+      closedByAdmin: false
+    };
   }
 
   function addToCart(menuId, qty) {

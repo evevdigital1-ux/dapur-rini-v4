@@ -322,7 +322,7 @@
       const categoryOk = activeCategory === 'Semua' || menu.category === activeCategory;
       const statusOk = activeStatus === 'ALL' || batch?.status === activeStatus;
       const text = `${menu.name} ${menu.category} ${menu.description}`.toLowerCase();
-      return menu.active && batch && categoryOk && statusOk && text.includes(searchTerm.toLowerCase());
+      return menu.active && categoryOk && statusOk && text.includes(searchTerm.toLowerCase());
     });
 
     app.innerHTML = `
