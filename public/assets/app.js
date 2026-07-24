@@ -268,7 +268,7 @@
       .slice(0, 3);
 
     if (!readyProducts.length) {
-      return `<div class="hero-showcase-empty"><strong>Belum ada PO satuan yang aktif.</strong><span>Pilih menu di katalog untuk menjadi pemesan pembuka.</span></div>`;
+      return `<div class="hero-showcase-empty"><strong>Menu Pilihan Hari Ini.</strong><span>Silakan pilih menu di katalog di bawah untuk melakukan pemesanan.</span></div>`;
     }
 
     return `
@@ -331,17 +331,17 @@
         <section class="hero" id="beranda">
           <div class="container hero-grid">
             <div class="hero-copy">
-              <span class="eyebrow">Dapur rumahan • Tegal Alur</span>
-              <h1>Pesan hari ini, dimasak segar untuk besok.</h1>
-              <p>Pilih paket nasi, donat, atau jajanan pasar. Beberapa menu memerlukan pemesan pembuka; setelah minimum terpenuhi dan dibayar, pelanggan lain dapat membeli satuan.</p>
+              <span class="eyebrow">Dapur Rumahan • Tegal Alur</span>
+              <h1>Pesan Hari Ini, Dimasak Segar Untuk Anda Besok.</h1>
+              <p>Nikmati pilihan Paket Nasi Rumahan, Donat Lezat, dan Jajanan Pasar Tradisional. Dibuat segar dari bahan berkualitas untuk hidangan harian dan acara spesial Anda.</p>
               <div class="hero-actions">
                 <button class="btn btn-primary" data-action="scroll-menu">Lihat menu hari ini</button>
-                <button class="btn btn-ghost" data-action="show-how">Cara kerja PO</button>
+                <button class="btn btn-ghost" data-action="show-how">Cara pemesanan</button>
               </div>
               <div class="hero-trust">
-                <span><b>18.00</b><small>Batas PO default</small></span>
-                <span><b>Besok</b><small>Jadwal produksi</small></span>
-                <span><b>2 cara</b><small>Ambil / dikirim</small></span>
+                <span><b>18.00 WIB</b><small>Batas pemesanan</small></span>
+                <span><b>Besok</b><small>Jadwal pengiriman</small></span>
+                <span><b>2 Pilihan</b><small>Ambil / Dikirim</small></span>
               </div>
             </div>
             ${heroShowcase(state)}
@@ -350,21 +350,21 @@
 
         <section class="section-tight po-guide-section">
           <div class="container info-strip" id="cara-kerja">
-            <div class="info-item"><span class="info-number">1</span><div><strong>Pilih menu</strong><span>Periksa status, jumlah minimum, waktu tutup, dan sisa kuota.</span></div></div>
-            <div class="info-item"><span class="info-number">2</span><div><strong>Bayar dan verifikasi</strong><span>Dalam demo, admin memeriksa bukti pembayaran sebelum pesanan diproses.</span></div></div>
-            <div class="info-item"><span class="info-number">3</span><div><strong>Terima keesokan hari</strong><span>Ambil di Tegal Alur atau pilih pengiriman sesuai area layanan.</span></div></div>
+            <div class="info-item"><span class="info-number">1</span><div><strong>Pilih menu</strong><span>Pilih varian menu favorit Anda dan tentukan jumlah porsi.</span></div></div>
+            <div class="info-item"><span class="info-number">2</span><div><strong>Bayar & konfirmasi</strong><span>Lakukan pembayaran via Transfer Bank, QRIS, atau Tunai saat pickup.</span></div></div>
+            <div class="info-item"><span class="info-number">3</span><div><strong>Terima keesokan hari</strong><span>Ambil langsung di Tegal Alur atau dikirim langsung ke lokasi Anda.</span></div></div>
           </div>
         </section>
 
         <section class="section catalog-section" id="menu">
           <div class="container">
             <div class="section-head">
-              <div><span class="eyebrow">Menu pre-order</span><h2>Mau makan apa besok?</h2><p>Pilih menu yang PO-nya sudah aktif atau jadilah pemesan pembuka sesuai jumlah minimum.</p></div>
+              <div><span class="eyebrow">Katalog Pilihan</span><h2>Mau Makan Apa Besok?</h2><p>Pilihan menu lezat masakan rumahan Dapur Rini favorit Anda untuk diantar atau diambil besok.</p></div>
               <button class="btn btn-ghost desktop-track" data-action="track-order">Lacak pesanan</button>
             </div>
             <div class="catalog-tools">
               <div class="search-box"><input id="menu-search" type="search" placeholder="Cari ayam, donat, kue bugis..." value="${esc(searchTerm)}" autocomplete="off" aria-label="Cari menu"></div>
-              <div class="status-filter"><label for="menu-status">Status PO</label><select id="menu-status"><option value="ALL" ${activeStatus === 'ALL' ? 'selected' : ''}>Semua status</option><option value="WAITING_OPENER" ${activeStatus === 'WAITING_OPENER' ? 'selected' : ''}>Butuh pembuka</option><option value="OPEN" ${activeStatus === 'OPEN' ? 'selected' : ''}>PO aktif</option><option value="CLOSING_SOON" ${activeStatus === 'CLOSING_SOON' ? 'selected' : ''}>Segera ditutup</option><option value="OPENER_PENDING_PAYMENT" ${activeStatus === 'OPENER_PENDING_PAYMENT' ? 'selected' : ''}>Menunggu pembayaran</option><option value="SOLD_OUT" ${activeStatus === 'SOLD_OUT' ? 'selected' : ''}>Kuota habis</option><option value="CLOSED" ${activeStatus === 'CLOSED' ? 'selected' : ''}>Ditutup</option></select></div>
+              <div class="status-filter"><label for="menu-status">Status PO</label><select id="menu-status"><option value="ALL" ${activeStatus === 'ALL' ? 'selected' : ''}>Semua status</option><option value="OPEN" ${activeStatus === 'OPEN' ? 'selected' : ''}>PO aktif</option><option value="CLOSING_SOON" ${activeStatus === 'CLOSING_SOON' ? 'selected' : ''}>Segera ditutup</option><option value="SOLD_OUT" ${activeStatus === 'SOLD_OUT' ? 'selected' : ''}>Kuota habis</option><option value="CLOSED" ${activeStatus === 'CLOSED' ? 'selected' : ''}>Ditutup</option></select></div>
             </div>
             <div class="chips">${categories.map((category) => `<button class="chip ${category === activeCategory ? 'active' : ''}" data-action="filter-category" data-category="${esc(category)}">${esc(category)}</button>`).join('')}</div>
             <div class="catalog-result">${menus.length} menu ditemukan</div>
@@ -378,15 +378,14 @@
           <div class="container">
             <div class="section-head"><div><span class="eyebrow">Pertanyaan umum</span><h2>Sebelum melakukan pemesanan</h2></div></div>
             <div class="faq-grid">
-              <details><summary>Mengapa beberapa menu belum bisa dibeli satuan?</summary><p>Menu tersebut belum mencapai minimum produksi. Pemesan pertama harus memesan sekurang-kurangnya jumlah pembuka yang tertera.</p></details>
-              <details><summary>Kapan menu mulai bisa dibeli per porsi?</summary><p>Setelah pembayaran pemesan pembuka diverifikasi, status berubah menjadi PO aktif dan pembeli berikutnya dapat memesan mulai satu porsi.</p></details>
-              <details><summary>Bagaimana proses pengiriman?</summary><p>Dapur Rini mengatur pengiriman secara manual. Ongkir dan waktu pengantaran dikonfirmasi melalui WhatsApp.</p></details>
-              <details><summary>Apakah pembayaran pada website ini nyata?</summary><p>Tidak. Rekening, QRIS, bukti pembayaran, pelanggan, dan seluruh transaksi masih menggunakan data demonstrasi.</p></details>
+              <details><summary>Bagaimana cara memesan di Dapur Rini?</summary><p>Pilih menu favorit Anda, pilih jumlah porsi, lalu isi data pemesanan. Pesanan akan dimasak segar dan siap diantar atau diambil sesuai jadwal.</p></details>
+              <details><summary>Apa saja pilihan pembayaran yang tersedia?</summary><p>Kami menerima Transfer Bank (BCA), QRIS, serta Tunai (Cash on Pickup) untuk pengambilan langsung.</p></details>
+              <details><summary>Bagaimana proses pengiriman pesanan?</summary><p>Pengiriman diatur langsung ke lokasi Anda di area layanan Jakarta Barat dan sekitarnya. Ongkir dan konfirmasi waktu kirim dikonfirmasi via WhatsApp.</p></details>
             </div>
           </div>
         </section>
       </main>
-      <footer class="footer"><div class="container footer-grid"><div><a class="brand" href="#beranda"><span class="brand-mark">DR</span><span class="brand-copy">${esc(state.settings.businessName)}<small>${esc(state.settings.location)}</small></span></a><p style="margin-top:16px">Prototipe sistem pre-order makanan rumahan. Belum menerima transaksi nyata.</p><small>Foto pilihan bersumber dari Wikimedia Commons; rincian terdapat pada ATTRIBUTIONS.md.</small></div><div><strong>Hubungi Dapur Rini</strong><a href="${waLink(state, state.settings.whatsappGreeting)}" target="_blank" rel="noopener">WhatsApp ${esc(state.settings.phone)}</a><a href="#testimoni">Lihat testimoni pelanggan</a><a href="#menu">Pilih menu hari ini</a></div><div><strong>Jam layanan</strong><p>${esc(state.settings.operationHours)}<br>PO default tutup ${esc(state.settings.defaultCutoff)}<br>Pengiriman hari berikutnya.</p></div></div></footer>
+      <footer class="footer"><div class="container footer-grid"><div><a class="brand" href="#beranda"><span class="brand-mark">DR</span><span class="brand-copy">${esc(state.settings.businessName)}<small>${esc(state.settings.location)}</small></span></a><p style="margin-top:16px">Layanan Pre-Order Masakan Rumahan Harian & Acara Spesial Dapur Rini. Bahan segar, higienis, dan terpercaya.</p><small>© 2026 Dapur Rini. Seluruh Hak Cipta Dilindungi.</small></div><div><strong>Hubungi Dapur Rini</strong><a href="${waLink(state, state.settings.whatsappGreeting)}" target="_blank" rel="noopener">WhatsApp ${esc(state.settings.phone)}</a><a href="#testimoni">Lihat testimoni pelanggan</a><a href="#menu">Pilih menu hari ini</a></div><div><strong>Jam layanan</strong><p>${esc(state.settings.operationHours)}<br>PO default tutup ${esc(state.settings.defaultCutoff)}<br>Pengiriman hari berikutnya.</p></div></div></footer>
       <button class="whatsapp-fab" data-action="open-whatsapp" aria-label="Hubungi Dapur Rini melalui WhatsApp"><span>WA</span><b>Tanya Dapur Rini</b></button>
       ${state.cart.length ? floatingCart(state) : ''}
       <nav class="customer-bottom-nav" aria-label="Navigasi pelanggan">
