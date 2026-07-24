@@ -557,7 +557,7 @@ function updateMenu(state, menuId, patch) {
 
 function addMenu(state, payload) {
   const clean = validateMenuPayload(payload, false);
-  const menu = { id: uid('menu'), sortOrder: clean.sortOrder || state.menus.length + 1, ...clean, regularMin: 1, icon: cleanText(payload.icon || '🍽️', 'Ikon', { max: 8 }), image: clean.image || 'assets/images/jajan-pasar.webp', imageAlt: clean.imageAlt || `Foto demo ${clean.name}`, featured: false, active: true, isDemo: true };
+  const menu = { id: uid('menu'), sortOrder: clean.sortOrder || state.menus.length + 1, ...clean, regularMin: 1, icon: cleanText(payload.icon || '🍽️', 'Ikon', { max: 8 }), image: clean.image || 'assets/images/jajan-pasar.webp', imageAlt: clean.imageAlt || `${clean.name}`, featured: false, active: true, isDemo: true };
   state.menus.push(menu);
   addLog(state, 'ADD_MENU', `${menu.name} ditambahkan.`, 'admin');
   return menu;

@@ -81,7 +81,7 @@
       defaultCapacity: row[6],
       icon: row[7],
       image: menuImages[row[0]],
-      imageAlt: `Foto demo ${row[1]}`,
+      imageAlt: `${row[1]}`,
       description: row[8],
       featured: index < 6 || [10, 13, 19].includes(index),
       active: true,
