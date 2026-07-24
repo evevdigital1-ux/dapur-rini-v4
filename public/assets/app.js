@@ -1145,15 +1145,26 @@
     const state = Store.getState();
     const item = state.testimonials.find((entry) => entry.id === testimonialId);
     const defaultImage = item?.image || 'assets/images/testimoni.webp';
-    openModal(`<form id="testimonial-form"><div class="modal-header"><div><h2>${item ? 'Edit testimoni' : 'Tambah testimoni'}</h2><div class="help">Screenshot WhatsApp akan ditampilkan pada landing page.</div></div><button type="button" class="close-btn" data-modal-close>×</button></div><div class="modal-body"><div class="testimonial-form-preview"><img id="testimonial-preview" src="${esc(defaultImage)}" alt="Pratinjau screenshot testimoni"></div><div class="form-grid"><div class="field"><label>Nama / inisial</label><input name="name" required value="${esc(item?.name || '')}" placeholder="Contoh: Maya ••••"></div><div class="field"><label>Menu yang dipesan</label><input name="menuName" required value="${esc(item?.menuName || '')}" placeholder="Paket Ayam Bakar"></div><div class="field field-full"><label>Caption singkat</label><input name="caption" value="${esc(item?.caption || '')}" placeholder="Bumbu meresap dan sambalnya pas."></div><div class="field"><label>Urutan tampil</label><input name="sortOrder" type="number" min="1" value="${Number(item?.sortOrder || state.testimonials.length + 1)}"></div><div class="field"><label>Screenshot WhatsApp</label><input id="testimonial-file" type="file" accept="image/*"><span class="help">Opsional. Gunakan gambar yang jelas dan sudah disamarkan.</span></div></div><input type="hidden" name="image" id="testimonial-image-value" value="${esc(defaultImage)}"><div class="notice warning" style="margin-top:14px">Pastikan nomor telepon, alamat, dan informasi pembayaran telah disamarkan.</div></div><div class="modal-footer"><button type="button" class="btn btn-ghost" data-modal-close>Batal</button><button class="btn btn-primary">Simpan testimoni</button></div></form>`, true);
+    openModal(`<form id="testimonial-form"><div class="modal-header"><div><h2>${item ? 'Edit testimoni' : 'Tambah testimoni'}</h2><div class="help">Screenshot WhatsApp akan dikompresi ke WebP dan ditampilkan pada landing page.</div></div><button type="button" class="close-btn" data-modal-close>×</button></div><div class="modal-body"><div class="testimonial-form-preview"><img id="testimonial-preview" src="${esc(defaultImage)}" alt="Pratinjau screenshot testimoni"></div><div id="testimonial-webp-status" class="notice info" style="margin-bottom:12px">Pilih file gambar untuk kompresi otomatis ke format **.WebP**.</div><div class="form-grid"><div class="field"><label>Nama / inisial</label><input name="name" required value="${esc(item?.name || '')}" placeholder="Contoh: Maya ••••"></div><div class="field"><label>Menu yang dipesan</label><input name="menuName" required value="${esc(item?.menuName || '')}" placeholder="Paket Ayam Bakar"></div><div class="field field-full"><label>Caption singkat</label><input name="caption" value="${esc(item?.caption || '')}" placeholder="Bumbu meresap dan sambalnya pas."></div><div class="field"><label>Urutan tampil</label><input name="sortOrder" type="number" min="1" value="${Number(item?.sortOrder || state.testimonials.length + 1)}"></div><div class="field field-full"><label>📸 Screenshot WhatsApp (Otomatis Kompres Ke WebP)</label><input id="testimonial-file" type="file" accept="image/*"><span class="help">Gambar asli otomatis dikompresi ke format .webp ringan. Harap samarkan data sensitif.</span></div></div><input type="hidden" name="image" id="testimonial-image-value" value="${esc(defaultImage)}"><div class="notice warning" style="margin-top:14px">Pastikan nomor telepon, alamat, dan informasi pembayaran telah disamarkan.</div></div><div class="modal-footer"><button type="button" class="btn btn-ghost" data-modal-close>Batal</button><button class="btn btn-primary">Simpan testimoni</button></div></form>`, true);
     const fileInput = document.getElementById('testimonial-file');
-    fileInput.onchange = () => {
+    const statusNotice = document.getElementById('testimonial-webp-status');
+    fileInput.onchange = async () => {
       const file = fileInput.files[0];
       if (!file) return;
-      if (file.size > 1.5 * 1024 * 1024) { toast('Ukuran screenshot maksimal 1,5 MB.', 'error'); fileInput.value = ''; return; }
-      const reader = new FileReader();
-      reader.onload = () => { document.getElementById('testimonial-image-value').value = reader.result; document.getElementById('testimonial-preview').src = reader.result; };
-      reader.readAsDataURL(file);
+      statusNotice.className = 'notice info';
+      statusNotice.innerHTML = '⚙️ Mengompresi screenshot ke format WebP...';
+      try {
+        const result = await compressImageToWebP(file);
+        document.getElementById('testimonial-image-value').value = result.dataUrl;
+        document.getElementById('testimonial-preview').src = result.dataUrl;
+        statusNotice.className = 'notice success';
+        statusNotice.innerHTML = `✅ Screenshot berhasil dikompresi ke <strong>WebP</strong> (${result.approxKb} KB, ${result.width}×${result.height}px). File asli telah dilepas dari memori.`;
+      } catch (error) {
+        toast(error.message, 'error');
+        statusNotice.className = 'notice danger';
+        statusNotice.innerHTML = `⚠️ ${esc(error.message)}`;
+        fileInput.value = '';
+      }
     };
     document.getElementById('testimonial-form').onsubmit = async (event) => {
       event.preventDefault();

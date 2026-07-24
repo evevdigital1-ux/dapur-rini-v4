@@ -254,9 +254,23 @@ async function executeCommand(command, payload, auth) {
           return domain.updateSettings(state, { ...(payload.patch || payload), ...(imagePath ? { qrisImage: imagePath } : {}) });
         case 'markNotificationRead': return domain.markNotificationRead(state, payload.notificationId);
         case 'markAllNotificationsRead': return domain.markAllNotificationsRead(state);
-        case 'addTestimonial': return domain.addTestimonial(state, { ...payload, image: imagePath || payload.image });
-        case 'updateTestimonial': return domain.updateTestimonial(state, payload.testimonialId, { ...(payload.patch || payload), image: imagePath || payload.patch?.image || payload.image });
-        case 'deleteTestimonial': return domain.deleteTestimonial(state, payload.testimonialId);
+        case 'addTestimonial': {
+          const data = { ...payload, ...(imagePath ? { image: imagePath } : {}) };
+          delete data.imageData;
+          return domain.addTestimonial(state, data);
+        }
+        case 'updateTestimonial': {
+          const item = state.testimonials.find((entry) => entry.id === payload.testimonialId);
+          if (item) previousPublicImage = item.image || '';
+          const patch = { ...(payload.patch || payload), ...(imagePath ? { image: imagePath } : {}) };
+          delete patch.imageData;
+          return domain.updateTestimonial(state, payload.testimonialId, patch);
+        }
+        case 'deleteTestimonial': {
+          const item = state.testimonials.find((entry) => entry.id === payload.testimonialId);
+          if (item && item.image) previousPublicImage = item.image;
+          return domain.deleteTestimonial(state, payload.testimonialId);
+        }
         case 'processExpiredOrders': return domain.processExpiredOrders(state);
         default: throw Object.assign(new Error('Perintah tidak dikenal.'), { statusCode: 400 });
       }
