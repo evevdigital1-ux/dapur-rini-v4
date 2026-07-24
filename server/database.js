@@ -94,14 +94,11 @@ function appendAuditFile(entry) {
 }
 
 async function resolveHost(rawUrl) {
-  const match = String(rawUrl || '').match(/@([a-zA-Z0-9.-]+):(\d+)\/(.+)/);
-  if (!match) return rawUrl;
-  const hostname = match[1];
-  const port = match[2];
-  const rest = match[3];
   const urlObj = new URL(rawUrl);
   const host = urlObj.hostname;
   if (!host || !host.includes('supabase.co') && !host.includes('supabase.com')) return rawUrl;
+  // Pooler (Supavisor) uses IPv4 — skip DNS resolution entirely
+  if (host.includes('pooler.supabase.com')) return rawUrl;
   try {
     await new Promise((resolve, reject) => {
       const dns = require('dns');
