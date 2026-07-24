@@ -93,6 +93,48 @@ function appendAuditFile(entry) {
   fs.appendFileSync(AUDIT_FILE, `${line}\n`, { encoding: 'utf8', mode: 0o600 });
 }
 
+async function resolveHost(rawUrl) {
+  const match = String(rawUrl || '').match(/@([a-zA-Z0-9.-]+):(\d+)\/(.+)/);
+  if (!match) return rawUrl;
+  const hostname = match[1];
+  const port = match[2];
+  const rest = match[3];
+  const urlObj = new URL(rawUrl);
+  const host = urlObj.hostname;
+  if (!host || !host.includes('supabase.co') && !host.includes('supabase.com')) return rawUrl;
+  try {
+    await new Promise((resolve, reject) => {
+      const dns = require('dns');
+      dns.lookup(host, { family: 6, hints: require('dns').AI_V4MAPPED | require('dns').ADDRCONFIG }, (err) => {
+        if (err) reject(err); else resolve();
+      });
+    });
+    return rawUrl;
+  } catch (_) {
+    const https = require('https');
+    return new Promise((resolve) => {
+      https.get(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(host)}&type=AAAA`, { headers: { Accept: 'application/dns-json' } }, (res) => {
+        let data = '';
+        res.on('data', (c) => data += c);
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            const aaaa = (parsed.Answer || []).find((r) => r.type === 28);
+            if (aaaa) {
+              const ipv6 = aaaa.data;
+              const resolved = rawUrl.replace(host, `[${ipv6}]`);
+              console.log(`DNS: ${host} -> ${ipv6}`);
+              resolve(resolved);
+            } else {
+              resolve(rawUrl);
+            }
+          } catch (_) { resolve(rawUrl); }
+        });
+      }).on('error', () => resolve(rawUrl));
+    });
+  }
+}
+
 async function getPool() {
   if (pool) return pool;
   let Pool;
@@ -100,8 +142,9 @@ async function getPool() {
   catch (_) {
     throw new Error('Driver PostgreSQL belum terpasang. Jalankan npm install sebelum memakai DATABASE_URL.');
   }
+  const connectionString = await resolveHost(DATABASE_URL);
   pool = new Pool({
-    connectionString: DATABASE_URL,
+    connectionString,
     max: Number(process.env.DAPUR_RINI_DB_POOL_SIZE || (process.env.VERCEL ? 1 : 5)),
     idleTimeoutMillis: Number(process.env.DAPUR_RINI_DB_IDLE_TIMEOUT_MS || 5000),
     connectionTimeoutMillis: Number(process.env.DAPUR_RINI_DB_CONNECT_TIMEOUT_MS || 10000),
