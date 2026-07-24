@@ -187,9 +187,9 @@
     });
 
     const testimonials = [
-      { id: 'testimonial-001', name: 'Maya ••••', menuName: 'Paket Ayam Bakar', image: 'assets/images/testimoni.webp', caption: 'Bumbu meresap dan sambalnya pas.', active: true, sortOrder: 1, isDemo: true },
-      { id: 'testimonial-002', name: 'Rina ••••', menuName: 'Donat Aneka Topping', image: 'assets/images/testimoni1.webp', caption: 'Donat lembut dan topping melimpah.', active: true, sortOrder: 2, isDemo: true },
-      { id: 'testimonial-003', name: 'Bu Sari ••••', menuName: 'Snack Box', image: 'assets/images/testimoni2.webp', caption: 'Datang tepat waktu dan tetap segar.', active: true, sortOrder: 3, isDemo: true }
+      { id: 'testimonial-001', name: 'Testimoni WhatsApp', menuName: '', image: 'assets/images/testimoni.webp', caption: '', active: true, sortOrder: 1, isDemo: true },
+      { id: 'testimonial-002', name: 'Testimoni WhatsApp', menuName: '', image: 'assets/images/testimoni1.webp', caption: '', active: true, sortOrder: 2, isDemo: true },
+      { id: 'testimonial-003', name: 'Testimoni WhatsApp', menuName: '', image: 'assets/images/testimoni2.webp', caption: '', active: true, sortOrder: 3, isDemo: true }
     ];
 
     const notifications = [

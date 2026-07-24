@@ -59,6 +59,15 @@ function ensureCollections(state) {
   state.activityLogs ||= [];
   state.notifications ||= [];
   state.testimonials ||= [];
+  if (Array.isArray(state.testimonials)) {
+    state.testimonials.forEach((item) => {
+      if (item.isDemo || /Maya|Rina|Bu Sari/i.test(item.name)) {
+        item.name = 'Testimoni WhatsApp';
+        item.menuName = '';
+        item.caption = '';
+      }
+    });
+  }
   state.settings ||= {};
   state.orders ||= [];
   state.menus ||= [];
@@ -603,7 +612,7 @@ function markAllNotificationsRead(state) {
 }
 
 function addTestimonial(state, payload) {
-  const item = { id: uid('testimonial'), name: cleanText(payload.name, 'Nama', { required: true, min: 2, max: 80 }), menuName: cleanText(payload.menuName, 'Nama menu', { required: true, min: 2, max: 100 }), image: cleanText(payload.image || 'assets/images/testimoni.webp', 'Gambar', { required: true, max: 400 }), caption: cleanText(payload.caption, 'Caption', { max: 300 }), active: payload.active !== false, sortOrder: payload.sortOrder === undefined ? state.testimonials.length + 1 : positiveInteger(payload.sortOrder, 'Urutan testimoni', { min: 1, max: 10000 }), isDemo: true };
+  const item = { id: uid('testimonial'), name: cleanText(payload.name || '', 'Nama', { max: 80 }) || 'Testimoni WhatsApp', menuName: cleanText(payload.menuName || '', 'Nama menu', { max: 100 }), image: cleanText(payload.image || 'assets/images/testimoni.webp', 'Gambar', { required: true, max: 400 }), caption: cleanText(payload.caption || '', 'Caption', { max: 300 }), active: payload.active !== false, sortOrder: payload.sortOrder === undefined ? state.testimonials.length + 1 : positiveInteger(payload.sortOrder, 'Urutan testimoni', { min: 1, max: 10000 }), isDemo: true };
   state.testimonials.push(item);
   addLog(state, 'ADD_TESTIMONIAL', `Testimoni ${item.name} ditambahkan.`, 'admin');
   return item;
@@ -612,9 +621,9 @@ function addTestimonial(state, payload) {
 function updateTestimonial(state, testimonialId, patch) {
   const item = state.testimonials.find((entry) => entry.id === testimonialId);
   if (!item) throw new Error('Testimoni tidak ditemukan.');
-  if (patch.name !== undefined) item.name = cleanText(patch.name, 'Nama', { required: true, min: 2, max: 80 });
-  if (patch.menuName !== undefined) item.menuName = cleanText(patch.menuName, 'Nama menu', { required: true, min: 2, max: 100 });
-  if (patch.caption !== undefined) item.caption = cleanText(patch.caption, 'Caption', { max: 300 });
+  if (patch.name !== undefined) item.name = cleanText(patch.name || '', 'Nama', { max: 80 }) || 'Testimoni WhatsApp';
+  if (patch.menuName !== undefined) item.menuName = cleanText(patch.menuName || '', 'Nama menu', { max: 100 });
+  if (patch.caption !== undefined) item.caption = cleanText(patch.caption || '', 'Caption', { max: 300 });
   if (patch.image !== undefined) item.image = cleanText(patch.image, 'Gambar', { required: true, max: 400 });
   if (patch.active !== undefined) item.active = Boolean(patch.active);
   if (patch.sortOrder !== undefined) item.sortOrder = positiveInteger(patch.sortOrder, 'Urutan testimoni', { min: 1, max: 10000 });
