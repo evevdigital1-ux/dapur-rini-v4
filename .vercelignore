@@ -1,0 +1,12 @@
+.git/
+.github/
+tests/
+docs/
+supabase/
+scripts/
+server/data/
+server/private-storage/
+*.md
+.env.example
+start-demo.sh
+START-DEMO.bat

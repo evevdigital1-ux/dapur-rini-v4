@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.vercel/
+backups/
+backup-supabase-*/
+server/data/*
+!server/data/.gitkeep
+server/private-storage/*
+!server/private-storage/.gitkeep
+**/pre-recovery-*/
+*.log
+.DS_Store
